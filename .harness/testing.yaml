@@ -9,7 +9,7 @@ pipeline:
         ci:
             codebase:
                 connectorRef: org.harnessorg
-                repoName: terraform-provider-harness
+                repoName: terraform-provider-harness-platform
                 build: <+input>
     stages:
         - stage:

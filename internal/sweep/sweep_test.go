@@ -3,20 +3,13 @@ package sweep_test
 import (
 	"testing"
 
-	sdk "github.com/harness/harness-go-sdk"
-	_ "github.com/harness/terraform-provider-harness/internal/service/cd/application"
-	_ "github.com/harness/terraform-provider-harness/internal/service/cd/cloudprovider"
-	_ "github.com/harness/terraform-provider-harness/internal/service/cd/secrets"
-	"github.com/harness/terraform-provider-harness/internal/sweep"
+	"github.com/harness/harness-go-sdk/harness/nextgen"
+	"github.com/harness/terraform-provider-harness-platform/internal/sweep"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestMain(m *testing.M) {
-	client, err := sdk.NewSession(&sdk.SessionOptions{})
-	if err != nil {
-		panic(err)
-	}
-
+	client := nextgen.NewAPIClient(nextgen.DefaultConfiguration())
 	sweep.SweeperClient = client
 	resource.TestMain(m)
 }

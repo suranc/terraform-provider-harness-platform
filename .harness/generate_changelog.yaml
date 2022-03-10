@@ -29,7 +29,7 @@ pipeline:
                                     command: |-
                                         set -x
 
-                                        git clone https://<+pipeline.variables.GITHUB_TOKEN>@github.com/harness/terraform-provider-harness.git .
+                                        git clone https://<+pipeline.variables.GITHUB_TOKEN>@github.com/harness/terraform-provider-harness-platform.git .
                                     shell: Bash
                           - step:
                                 type: Run
@@ -64,5 +64,5 @@ pipeline:
         ci:
             codebase:
                 connectorRef: org.harnessorg
-                repoName: terraform-provider-harness
+                repoName: terraform-provider-harness-platform
                 build: <+input>

@@ -2,13 +2,13 @@
 
 BUG FIXES:
 
-* Fixes issue with config-as-code secret references. ([#89](https://github.com/hashicorp/terraform-provider-harness/issues/89))
+* Fixes issue with config-as-code secret references. ([#89](https://github.com/hashicorp/terraform-provider-harness-platform/issues/89))
 
 # 0.1.14
 
 ENHANCEMENTS:
 
-* data-source/harness_environment: Replaces `id` field with `environment_id` so `id` field can be marked as computed. ([#81](https://github.com/hashicorp/terraform-provider-harness/issues/81))
+* data-source/harness_environment: Replaces `id` field with `environment_id` so `id` field can be marked as computed. ([#81](https://github.com/hashicorp/terraform-provider-harness-platform/issues/81))
 
 # 0.1.13
 
@@ -18,12 +18,12 @@ FEATURES:
 
 ENHANCEMENTS:
 
-* data-source/harness_current_user: Change `2fa_enabled` to `is_two_factor_auth_enabled` to support `cdk` usage. ([#75](https://github.com/hashicorp/terraform-provider-harness/issues/75))
+* data-source/harness_current_user: Change `2fa_enabled` to `is_two_factor_auth_enabled` to support `cdk` usage. ([#75](https://github.com/hashicorp/terraform-provider-harness-platform/issues/75))
 
 BUG FIXES:
 
-* Added configuration for auto generating the changelog ([#78](https://github.com/hashicorp/terraform-provider-harness/issues/78))
-* Fixed missing nextgen auth configuration in the provider. ([#76](https://github.com/hashicorp/terraform-provider-harness/issues/76))
+* Added configuration for auto generating the changelog ([#78](https://github.com/hashicorp/terraform-provider-harness-platform/issues/78))
+* Fixed missing nextgen auth configuration in the provider. ([#76](https://github.com/hashicorp/terraform-provider-harness-platform/issues/76))
 
 # 0.1.12
 
@@ -35,7 +35,7 @@ BUG FIXES:
 
 BUG FIXES:
 
-* Upgraded harness-go-sdk to v0.1.11 to fix authentication configuration bug [71](https://github.com/harness/terraform-provider-harness/issues/71)
+* Upgraded harness-go-sdk to v0.1.11 to fix authentication configuration bug [71](https://github.com/harness/terraform-provider-harness-platform/issues/71)
 
 ## 0.1.10
 
@@ -73,4 +73,4 @@ ENHANCEMENTS:
 BUG FIXES:
 
 * resource/harness_environment: Variable override field `service_name` is now optional. This allows a variable override to apply to all services when being deployed to an environment.
-* Fixes delegate not found panic [#64](https://github.com/harness/terraform-provider-harness/issues/64)
+* Fixes delegate not found panic [#64](https://github.com/harness/terraform-provider-harness-platform/issues/64)
