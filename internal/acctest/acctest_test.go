@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	sdk "github.com/harness/harness-go-sdk"
 	"github.com/harness/harness-go-sdk/harness/helpers"
-	"github.com/harness/terraform-provider-harness/internal/provider"
+	"github.com/harness/harness-go-sdk/harness/nextgen"
+	"github.com/harness/terraform-provider-harness-platform/internal/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/stretchr/testify/require"
 )
@@ -33,7 +33,7 @@ func TestProvider_configure_url(t *testing.T) {
 	// Verify
 	require.False(t, diags.HasError())
 	require.NoError(t, p.InternalValidate())
-	c := p.Meta().(*sdk.Session)
+	c := p.Meta().(*nextgen.APIClient)
 	require.Equal(t, expectedEndpoint, c.Endpoint)
 }
 
@@ -58,6 +58,6 @@ func TestProvider_configure_url_env(t *testing.T) {
 	// Verify
 	require.False(t, diags.HasError())
 	require.NoError(t, p.InternalValidate())
-	c := p.Meta().(*sdk.Session)
+	c := p.Meta().(*nextgen.APIClient)
 	require.Equal(t, expectedEndpoint, c.Endpoint)
 }

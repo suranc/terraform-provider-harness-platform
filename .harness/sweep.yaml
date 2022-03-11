@@ -9,7 +9,7 @@ pipeline:
         ci:
             codebase:
                 connectorRef: org.harnessorg
-                repoName: terraform-provider-harness
+                repoName: terraform-provider-harness-platform
                 build: <+input>
     stages:
         - stage:
@@ -27,7 +27,7 @@ pipeline:
                                         limits:
                                             memory: 1Gi
                                             cpu: "1"
-                                    key: terraform-provider-harness-{{ checksum "go.mod" }}
+                                    key: terraform-provider-harness-platform-{{ checksum "go.mod" }}
                                     connectorRef: org.gcp
                                     bucket: harness-micah-test
                                     archiveFormat: Gzip
@@ -51,7 +51,7 @@ pipeline:
                                 spec:
                                     connectorRef: org.gcp
                                     bucket: harness-micah-test
-                                    key: terraform-provider-harness-{{ checksum "go.mod" }}
+                                    key: terraform-provider-harness-platform-{{ checksum "go.mod" }}
                                     sourcePaths:
                                         - ./vendor
                                     archiveFormat: Gzip

@@ -1,0 +1,10 @@
+```release-note:new-resource
+data-source/connector
+data-source/current_user
+data-source/organization
+data-source/project
+organization
+project
+connector
+```
+

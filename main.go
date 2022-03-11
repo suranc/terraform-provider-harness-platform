@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/harness/terraform-provider-harness/internal/provider"
+	"github.com/harness/terraform-provider-harness-platform/internal/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
 
