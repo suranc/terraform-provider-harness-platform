@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	//"github.com/antihax/optional"
-	//sdk "github.com/harness/harness-go-sdk"
 	"github.com/harness/harness-go-sdk/harness/nextgen"
 	"github.com/harness/terraform-provider-harness-platform/internal/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
