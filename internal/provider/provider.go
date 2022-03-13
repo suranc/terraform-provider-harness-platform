@@ -61,11 +61,13 @@ func Provider(version string) func() *schema.Provider {
 				"harness_current_user": service.DataSourceCurrentUser(),
 				"harness_organization": service.DataSourceOrganization(),
 				"harness_project":      service.DataSourceProject(),
+				"harness_pipeline":     service.DataSourcePipeline(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
 				"harness_connector":    connector.ResourceConnector(),
 				"harness_organization": service.ResourceOrganization(),
 				"harness_project":      service.ResourceProject(),
+				"harness_pipeline":     service.ResourcePipeline(),
 			},
 		}
 
