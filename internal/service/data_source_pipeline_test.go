@@ -45,8 +45,8 @@ func testAccDataSourcePipeline(id string, orgId string, projId string) string {
 					tags: {}
 					stages:
 						- stage:
-							name: dep
-							identifier: dep
+							name: TestStage
+							identifier: TestStage
 							description: ""
 							type: Deployment
 							spec:
