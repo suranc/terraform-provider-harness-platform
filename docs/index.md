@@ -7,7 +7,6 @@ description: |-
 
 # Harness Platform Provider
 
-The Terraform provider for the [harness.io](https://harness.io) software delivery platform.
 
 ## Example Usage
 
