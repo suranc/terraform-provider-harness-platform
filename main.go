@@ -37,7 +37,7 @@ func main() {
 	opts := &plugin.ServeOpts{ProviderFunc: provider.Provider(version)}
 
 	if debugMode {
-		err := plugin.Debug(context.Background(), "harness/harness", opts)
+		err := plugin.Debug(context.Background(), "harness/harness-platform", opts)
 		if err != nil {
 			log.Fatal(err.Error())
 		}

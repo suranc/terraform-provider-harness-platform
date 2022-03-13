@@ -1,0 +1,29 @@
+page_title: "Harness Platform Provider"
+subcategory: ""
+description: |-
+  The Terraform provider for the [harness.io](https://harness.io) software delivery platform.
+
+---
+
+# Harness Platform Provider
+{{ .Description | trimspace }}
+
+## Example Usage
+
+```terraform
+terraform {
+  required_providers {
+    harness = {
+      source = "harness/harness-platform"
+    }
+  }
+}
+
+provider "harness" {
+  endpoint   = "https://app.harness.io/gateway"
+  account_id = "...."
+  api_key    = "......"
+}
+```
+
+{{ .SchemaMarkdown | trimspace }}
