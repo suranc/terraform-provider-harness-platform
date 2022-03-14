@@ -21,7 +21,7 @@ func TestAccDataSourcePipeline(t *testing.T) {
 		ProviderFactories: acctest.ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourcePipeline(id, orgId),
+				Config: testAccDataSourcePipeline(id, orgId, projId),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "id", id),
 					resource.TestCheckResourceAttr(resourceName, "org_id", orgId),

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/antihax/optional"
 	"github.com/harness/harness-go-sdk/harness/nextgen"
 	"github.com/harness/harness-go-sdk/harness/utils"
 	"github.com/harness/terraform-provider-harness-platform/internal/acctest"
@@ -33,7 +32,7 @@ func TestAccResourcePipeline(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourcePipeline(id, updatedName),
+				Config: testAccResourcePipeline(updatedId, updatedId, projId),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "id", updatedId),
 					resource.TestCheckResourceAttr(resourceName, "name", updatedId),
@@ -54,26 +53,26 @@ func TestAccResourcePipeline(t *testing.T) {
 	})
 }
 
-func testAccGetPipeline(resourceName string, state *terraform.State) (*nextgen.Pipeline, error) {
+func testAccGetPipeline(resourceName string, state *terraform.State) (*nextgen.PmsPipelineResponse, error) {
 	r := acctest.TestAccGetResource(resourceName, state)
 	c := acctest.TestAccGetApiClientFromProvider()
 	id := r.Primary.ID
 	orgId := r.Primary.Attributes["org_id"]
 	projId := r.Primary.Attributes["project_id"]
 
-	resp, _, err := c.NGClient.PipelineApi.GetPipeline(context.Background(), c.AccountId, orgId, projId, id, &nextgen.PipelineApiGetPipelineOpts{})
+	resp, _, err := c.PipelinesApi.GetPipeline(context.Background(), c.AccountId, orgId, projId, id, &nextgen.PipelinesApiGetPipelineOpts{})
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.Data.Pipeline, nil
+	return resp.Data, nil
 }
 
 func testAccPipelineDestroy(resourceName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		pipeline, _ := testAccGetPipeline(resourceName, state)
 		if pipeline != nil {
-			return fmt.Errorf("Found pipeline: %s", pipeline.Identifier)
+			return fmt.Errorf("Found pipeline: %s", pipeline.YamlPipeline)
 		}
 
 		return nil
