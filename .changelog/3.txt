@@ -1,0 +1,8 @@
+```release-note:new-resource
+pipeline
+```
+
+```release-note:new-data-source
+pipeline
+```
+
