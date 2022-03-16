@@ -31,10 +31,10 @@ func ResourcePipeline() *schema.Resource {
 		CreateContext: resourcePipelineCreate,
 		Importer: &schema.ResourceImporter{
 			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-				// <org_id>/<project_id>/<pipeline_id>
 				parts := strings.Split(d.Id(), "/")
 				d.Set("org_id", parts[0])
 				d.Set("project_id", parts[1])
+				d.Set("identifier", parts[2])
 				d.SetId(parts[2])
 
 				return []*schema.ResourceData{d}, nil
@@ -42,6 +42,11 @@ func ResourcePipeline() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			"identifier": {
+				Description: "The identifier of the pipeline.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"org_id": {
 				Description: "Unique identifier of the organization.",
 				Type:        schema.TypeString,
@@ -68,10 +73,15 @@ func ResourcePipeline() *schema.Resource {
 
 // Build PipelineYAML object from stored pipeline yaml
 func buildPipeline(d *schema.ResourceData) *PipelineYAML {
-	var Pipeline PipelineYAML
-	yaml.Unmarshal([]byte(d.Get("pipeline_yaml").(string)), &Pipeline)
+	var PipelineYaml PipelineYAML
+	yaml.Unmarshal([]byte(d.Get("pipeline_yaml").(string)), &PipelineYaml)
 
-	return &Pipeline
+	// d.Set("identifier", PipelineYaml.Pipeline.Identifier)
+	// d.Set("org_id", PipelineYaml.Pipeline.OrgIdentifier)
+	// d.Set("project_id", PipelineYaml.Pipeline.ProjectIdentifier)
+	// d.Set("name", PipelineYaml.Pipeline.Name)
+
+	return &PipelineYaml
 }
 
 // Read response from API out to the stored identifiers
@@ -82,6 +92,7 @@ func readPipeline(d *schema.ResourceData, PmsPipelineResponse *nextgen.PmsPipeli
 	yaml.Unmarshal([]byte(PmsPipelineResponse.YamlPipeline), &Pipeline)
 
 	d.SetId(Pipeline.Pipeline.Identifier)
+	d.Set("identifier", Pipeline.Pipeline.Identifier)
 	d.Set("org_id", Pipeline.Pipeline.OrgIdentifier)
 	d.Set("project_id", Pipeline.Pipeline.ProjectIdentifier)
 	d.Set("name", Pipeline.Pipeline.Name)
@@ -90,9 +101,16 @@ func readPipeline(d *schema.ResourceData, PmsPipelineResponse *nextgen.PmsPipeli
 func resourcePipelineRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	c := meta.(*nextgen.APIClient)
 
-	pipeline := buildPipeline(d)
+	id := d.Id()
 
-	resp, _, err := c.PipelinesApi.GetPipeline(ctx, c.AccountId, pipeline.Pipeline.OrgIdentifier, pipeline.Pipeline.ProjectIdentifier, pipeline.Pipeline.Identifier, &nextgen.PipelinesApiGetPipelineOpts{})
+	resp, _, err := c.PipelinesApi.GetPipeline(ctx,
+		c.AccountId,
+		d.Get("org_id").(string),
+		d.Get("project_id").(string),
+		id,
+		&nextgen.PipelinesApiGetPipelineOpts{},
+	)
+
 	if err != nil {
 		return diag.Errorf(err.(nextgen.GenericSwaggerError).Error())
 	}

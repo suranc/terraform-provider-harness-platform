@@ -16,8 +16,6 @@ func TestAccResourcePipeline(t *testing.T) {
 	id := fmt.Sprintf("%s_%s", t.Name(), utils.RandStringBytes(6))
 	name := id
 	updatedName := fmt.Sprintf("%s_updated", id)
-	orgId := "default"
-	projId := "First"
 
 	resourceName := "harness_pipeline.test"
 
@@ -27,14 +25,14 @@ func TestAccResourcePipeline(t *testing.T) {
 		CheckDestroy:      testAccPipelineDestroy(resourceName),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourcePipeline(id, orgId, projId, name),
+				Config: testAccResourcePipeline(id, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "id", id),
 					resource.TestCheckResourceAttr(resourceName, "name", name),
 				),
 			},
 			{
-				Config: testAccResourcePipeline(id, orgId, projId, updatedName),
+				Config: testAccResourcePipeline(id, updatedName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "id", id),
 					resource.TestCheckResourceAttr(resourceName, "name", updatedName),
@@ -82,16 +80,28 @@ func testAccPipelineDestroy(resourceName string) resource.TestCheckFunc {
 	}
 }
 
-func testAccResourcePipeline(id string, orgId string, projId string, name string) string {
+func testAccResourcePipeline(id string, name string) string {
 	return fmt.Sprintf(`
+				resource "harness_organization" "test" {
+					identifier = "%[1]s"
+					name = "%[2]s"
+				}
+
+				resource "harness_project" "test" {
+					identifier = "%[1]s"
+					name = "%[2]s"
+					org_id = harness_organization.test.id
+					color = "#472848"
+				}
+
         resource "harness_pipeline" "test" {
             pipeline_yaml = <<-EOT
                 pipeline:
-                    name: %[4]s
+                    name: %[2]s
                     identifier: %[1]s
                     allowStageExecutions: false
-                    projectIdentifier: %[3]s
-                    orgIdentifier: %[2]s
+                    projectIdentifier: ${harness_project.test.id}
+                    orgIdentifier: ${harness_project.test.org_id}
                     tags: {}
                     stages:
                         - stage:
@@ -173,5 +183,5 @@ func testAccResourcePipeline(id string, orgId string, projId string, name string
                                             type: StageRollback
             EOT
         }
-        `, id, orgId, projId, name)
+        `, id, name)
 }
