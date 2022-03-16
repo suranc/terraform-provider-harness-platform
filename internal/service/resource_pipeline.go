@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -30,6 +31,12 @@ func ResourcePipeline() *schema.Resource {
 		CreateContext: resourcePipelineCreate,
 		Importer: &schema.ResourceImporter{
 			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				// <org_id>/<project_id>/<pipeline_id>
+				parts := strings.Split(d.Id(), "/")
+				d.Set("org_id", parts[0])
+				d.Set("project_id", parts[1])
+				d.SetId(parts[2])
+
 				return []*schema.ResourceData{d}, nil
 			},
 		},
