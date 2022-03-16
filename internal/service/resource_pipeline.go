@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/harness/harness-go-sdk/harness/nextgen"
@@ -11,11 +12,11 @@ import (
 )
 
 type PipelineYAML struct {
-	Pipeline	struct {
-		Name	string `yaml:"name"`
-		Identifier	string `yaml:"identifier"`
-		ProjectIdentifier	string `yaml:"projectIdentifier"`
-		OrgIdentifier	string `yaml:"orgIdentifier"`
+	Pipeline struct {
+		Name              string `yaml:"name"`
+		Identifier        string `yaml:"identifier"`
+		ProjectIdentifier string `yaml:"projectIdentifier"`
+		OrgIdentifier     string `yaml:"orgIdentifier"`
 	}
 }
 
@@ -44,10 +45,15 @@ func ResourcePipeline() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"name": {
+				Description: "Name of the pipeline.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"pipeline_yaml": {
 				Description: "YAML of the pipeline.",
 				Type:        schema.TypeString,
-				Required:	 true,
+				Required:    true,
 			},
 		},
 	}
@@ -71,6 +77,7 @@ func readPipeline(d *schema.ResourceData, PmsPipelineResponse *nextgen.PmsPipeli
 	d.SetId(Pipeline.Pipeline.Identifier)
 	d.Set("org_id", Pipeline.Pipeline.OrgIdentifier)
 	d.Set("project_id", Pipeline.Pipeline.ProjectIdentifier)
+	d.Set("name", Pipeline.Pipeline.Name)
 }
 
 func resourcePipelineRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -93,7 +100,7 @@ func resourcePipelineCreate(ctx context.Context, d *schema.ResourceData, meta in
 
 	pipeline := buildPipeline(d)
 
-	_, _, err := c.PipelinesApi.PostPipelineV2(ctx, d.Get("pipeline_yaml").(string), c.AccountId, pipeline.Pipeline.OrgIdentifier, pipeline.Pipeline.ProjectIdentifier, &nextgen.PipelinesApiPostPipelineV2Opts{})
+	_, _, err := c.PipelinesApi.PostPipeline(ctx, d.Get("pipeline_yaml").(string), c.AccountId, pipeline.Pipeline.OrgIdentifier, pipeline.Pipeline.ProjectIdentifier, &nextgen.PipelinesApiPostPipelineOpts{})
 	if err != nil {
 		return diag.Errorf(err.(nextgen.GenericSwaggerError).Error())
 	}

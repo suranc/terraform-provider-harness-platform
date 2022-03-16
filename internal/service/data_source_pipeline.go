@@ -26,10 +26,15 @@ func DataSourcePipeline() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"name": {
+				Description: "Name of the pipeline.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"pipeline_yaml": {
 				Description: "YAML of the pipeline.",
 				Type:        schema.TypeString,
-				Required:	 true,
+				Required:    true,
 			},
 		},
 	}

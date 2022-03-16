@@ -14,9 +14,11 @@ import (
 
 func TestAccResourcePipeline(t *testing.T) {
 	id := fmt.Sprintf("%s_%s", t.Name(), utils.RandStringBytes(6))
-	updatedId := fmt.Sprintf("%s_updated", id)
-	orgId := "testOrg"
-	projId := "testProj"
+	name := id
+	updatedName := fmt.Sprintf("%s_updated", id)
+	orgId := "default"
+	projId := "First"
+
 	resourceName := "harness_pipeline.test"
 
 	resource.UnitTest(t, resource.TestCase{
@@ -25,17 +27,17 @@ func TestAccResourcePipeline(t *testing.T) {
 		CheckDestroy:      testAccPipelineDestroy(resourceName),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourcePipeline(id, orgId, projId),
+				Config: testAccResourcePipeline(id, orgId, projId, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "id", id),
-					resource.TestCheckResourceAttr(resourceName, "name", id),
+					resource.TestCheckResourceAttr(resourceName, "name", name),
 				),
 			},
 			{
-				Config: testAccResourcePipeline(updatedId, updatedId, projId),
+				Config: testAccResourcePipeline(id, orgId, projId, updatedName),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "id", updatedId),
-					resource.TestCheckResourceAttr(resourceName, "name", updatedId),
+					resource.TestCheckResourceAttr(resourceName, "id", id),
+					resource.TestCheckResourceAttr(resourceName, "name", updatedName),
 				),
 			},
 			{
@@ -46,7 +48,8 @@ func TestAccResourcePipeline(t *testing.T) {
 					primary := s.RootModule().Resources[resourceName].Primary
 					id := primary.ID
 					org_id := primary.Attributes["org_id"]
-					return fmt.Sprintf("%s/%s", org_id, id), nil
+					project_id := primary.Attributes["project_id"]
+					return fmt.Sprintf("%s/%s/%s", org_id, project_id, id), nil
 				},
 			},
 		},
@@ -79,96 +82,96 @@ func testAccPipelineDestroy(resourceName string) resource.TestCheckFunc {
 	}
 }
 
-func testAccResourcePipeline(id string, orgId string, projId string) string {
+func testAccResourcePipeline(id string, orgId string, projId string, name string) string {
 	return fmt.Sprintf(`
-		resource "harness_pipeline" "test" {
-			pipeline_yaml = <<-EOT
-				pipeline:
-					name: %[1]s
-					identifier: %[1]s
-					allowStageExecutions: false
-					projectIdentifier: %[3]s
-					orgIdentifier: %[2]s
-					tags: {}
-					stages:
-						- stage:
-							name: dep
-							identifier: dep
-							description: ""
-							type: Deployment
-							spec:
-								serviceConfig:
-									serviceRef: service
-									serviceDefinition:
-										type: Kubernetes
-										spec:
-											variables: []
-								infrastructure:
-									environmentRef: testenv
-									infrastructureDefinition:
-										type: KubernetesDirect
-										spec:
-											connectorRef: testconf
-											namespace: test
-											releaseName: release-<+INFRA_KEY>
-									allowSimultaneousDeployments: false
-								execution:
-									steps:
-										- stepGroup:
-												name: Canary Deployment
-												identifier: canaryDepoyment
-												steps:
-													- step:
-														name: Canary Deployment
-														identifier: canaryDeployment
-														type: K8sCanaryDeploy
-														timeout: 10m
-														spec:
-															instanceSelection:
-																type: Count
-																spec:
-																	count: 1
-															skipDryRun: false
-													- step:
-														name: Canary Delete
-														identifier: canaryDelete
-														type: K8sCanaryDelete
-														timeout: 10m
-														spec: {}
-												rollbackSteps:
-													- step:
-														name: Canary Delete
-														identifier: rollbackCanaryDelete
-														type: K8sCanaryDelete
-														timeout: 10m
-														spec: {}
-										- stepGroup:
-												name: Primary Deployment
-												identifier: primaryDepoyment
-												steps:
-													- step:
-														name: Rolling Deployment
-														identifier: rollingDeployment
-														type: K8sRollingDeploy
-														timeout: 10m
-														spec:
-															skipDryRun: false
-												rollbackSteps:
-													- step:
-														name: Rolling Rollback
-														identifier: rollingRollback
-														type: K8sRollingRollback
-														timeout: 10m
-														spec: {}
-									rollbackSteps: []
-							tags: {}
-							failureStrategies:
-								- onFailure:
-										errors:
-											- AllErrors
-										action:
-											type: StageRollback
-			EOT
-		}
-	`, id, orgId, projId)
+        resource "harness_pipeline" "test" {
+            pipeline_yaml = <<-EOT
+                pipeline:
+                    name: %[4]s
+                    identifier: %[1]s
+                    allowStageExecutions: false
+                    projectIdentifier: %[3]s
+                    orgIdentifier: %[2]s
+                    tags: {}
+                    stages:
+                        - stage:
+                            name: dep
+                            identifier: dep
+                            description: ""
+                            type: Deployment
+                            spec:
+                                serviceConfig:
+                                    serviceRef: service
+                                    serviceDefinition:
+                                        type: Kubernetes
+                                        spec:
+                                            variables: []
+                                infrastructure:
+                                    environmentRef: testenv
+                                    infrastructureDefinition:
+                                        type: KubernetesDirect
+                                        spec:
+                                            connectorRef: testconf
+                                            namespace: test
+                                            releaseName: release-<+INFRA_KEY>
+                                    allowSimultaneousDeployments: false
+                                execution:
+                                    steps:
+                                        - stepGroup:
+                                                name: Canary Deployment
+                                                identifier: canaryDepoyment
+                                                steps:
+                                                    - step:
+                                                        name: Canary Deployment
+                                                        identifier: canaryDeployment
+                                                        type: K8sCanaryDeploy
+                                                        timeout: 10m
+                                                        spec:
+                                                            instanceSelection:
+                                                                type: Count
+                                                                spec:
+                                                                    count: 1
+                                                            skipDryRun: false
+                                                    - step:
+                                                        name: Canary Delete
+                                                        identifier: canaryDelete
+                                                        type: K8sCanaryDelete
+                                                        timeout: 10m
+                                                        spec: {}
+                                                rollbackSteps:
+                                                    - step:
+                                                        name: Canary Delete
+                                                        identifier: rollbackCanaryDelete
+                                                        type: K8sCanaryDelete
+                                                        timeout: 10m
+                                                        spec: {}
+                                        - stepGroup:
+                                                name: Primary Deployment
+                                                identifier: primaryDepoyment
+                                                steps:
+                                                    - step:
+                                                        name: Rolling Deployment
+                                                        identifier: rollingDeployment
+                                                        type: K8sRollingDeploy
+                                                        timeout: 10m
+                                                        spec:
+                                                            skipDryRun: false
+                                                rollbackSteps:
+                                                    - step:
+                                                        name: Rolling Rollback
+                                                        identifier: rollingRollback
+                                                        type: K8sRollingRollback
+                                                        timeout: 10m
+                                                        spec: {}
+                                    rollbackSteps: []
+                            tags: {}
+                            failureStrategies:
+                                - onFailure:
+                                        errors:
+                                            - AllErrors
+                                        action:
+                                            type: StageRollback
+            EOT
+        }
+        `, id, orgId, projId, name)
 }
