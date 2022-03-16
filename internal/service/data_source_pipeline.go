@@ -16,15 +16,20 @@ func DataSourcePipeline() *schema.Resource {
 		ReadContext: dataSourcePipelineRead,
 
 		Schema: map[string]*schema.Schema{
+			"identifier": {
+				Description: "Unique identifier of the pipeline.",
+				Type:        schema.TypeString,
+				Required:    true,
+			},
 			"org_id": {
 				Description: "Unique identifier of the organization.",
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 			},
 			"project_id": {
 				Description: "Unique identifier of the project.",
 				Type:        schema.TypeString,
-				Computed:    true,
+				Required:    true,
 			},
 			"name": {
 				Description: "Name of the pipeline.",
@@ -34,7 +39,7 @@ func DataSourcePipeline() *schema.Resource {
 			"pipeline_yaml": {
 				Description: "YAML of the pipeline.",
 				Type:        schema.TypeString,
-				Required:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -43,11 +48,22 @@ func DataSourcePipeline() *schema.Resource {
 func dataSourcePipelineRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	c := meta.(*nextgen.APIClient)
 
-	pipeline := buildPipeline(d)
+	resp, _, err := c.PipelinesApi.GetPipeline(ctx,
+		c.AccountId,
+		d.Get("org_id").(string),
+		d.Get("project_id").(string),
+		d.Id(),
+		&nextgen.PipelinesApiGetPipelineOpts{},
+	)
 
-	resp, _, err := c.PipelinesApi.GetPipeline(ctx, c.AccountId, pipeline.Pipeline.OrgIdentifier, pipeline.Pipeline.ProjectIdentifier, pipeline.Pipeline.Identifier, &nextgen.PipelinesApiGetPipelineOpts{})
 	if err != nil {
-		return diag.FromErr(err)
+		e := err.(nextgen.GenericSwaggerError)
+		if e.Code() == nextgen.ErrorCodes.ResourceNotFound {
+			d.SetId("")
+			d.MarkNewResource()
+			return nil
+		}
+		return diag.Errorf(err.(nextgen.GenericSwaggerError).Error())
 	}
 
 	readPipeline(d, resp.Data)

@@ -12,8 +12,6 @@ import (
 func TestAccDataSourcePipeline(t *testing.T) {
 
 	id := fmt.Sprintf("%s_%s", t.Name(), utils.RandStringBytes(6))
-	orgId := "default"
-	projId := "First"
 	name := id
 	resourceName := "data.harness_pipeline.test"
 
@@ -22,28 +20,46 @@ func TestAccDataSourcePipeline(t *testing.T) {
 		ProviderFactories: acctest.ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourcePipeline(id, orgId, projId, name),
+				Config: testAccDataSourcePipeline(id, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "id", id),
-					resource.TestCheckResourceAttr(resourceName, "org_id", orgId),
+					resource.TestCheckResourceAttr(resourceName, "org_id", id),
 					resource.TestCheckResourceAttr(resourceName, "name", name),
-					resource.TestCheckResourceAttr(resourceName, "project_id", projId),
+					resource.TestCheckResourceAttr(resourceName, "project_id", id),
 				),
 			},
 		},
 	})
 }
 
-func testAccDataSourcePipeline(id string, orgId string, projId string, name string) string {
+func testAccDataSourcePipeline(id string, name string) string {
 	return fmt.Sprintf(`
+        resource "harness_organization" "test" {
+            identifier = "%[1]s"
+            name = "%[2]s"
+        }
+
+        resource "harness_project" "test" {
+            identifier = "%[1]s"
+            name = "%[2]s"
+            org_id = harness_organization.test.id
+            color = "#472848"
+        }
+        
+        data "harness_pipeline" "test" {
+            identifier = harness_pipeline.test.id
+            org_id = harness_pipeline.test.org_id
+            project_id = harness_pipeline.test.project_id
+        }
+
         resource "harness_pipeline" "test" {
             pipeline_yaml = <<-EOT
                 pipeline:
-                    name: %[4]s
+                    name: %[2]s
                     identifier: %[1]s
                     allowStageExecutions: false
-                    projectIdentifier: %[3]s
-                    orgIdentifier: %[2]s
+                    projectIdentifier: ${harness_project.test.identifier}
+                    orgIdentifier: ${harness_project.test.org_id}
                     tags: {}
                     stages:
                         - stage:
@@ -125,5 +141,5 @@ func testAccDataSourcePipeline(id string, orgId string, projId string, name stri
                                             type: StageRollback
             EOT
         }
-    `, id, orgId, projId, name)
+    `, id, name)
 }
